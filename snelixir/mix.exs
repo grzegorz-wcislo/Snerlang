@@ -4,7 +4,9 @@ defmodule Snelixir.MixProject do
   def project do
     [
       app: :snelixir,
-      version: "0.1.0",elixir: "~> 1.8",
+      version: "0.1.0",
+      elixir: "~> 1.8",
+      build_embedded: Mix.env == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -19,7 +21,8 @@ defmodule Snelixir.MixProject do
 
   defp deps do
     [
-      {:plug_cowboy, "~> 2.0"}
+      {:plug_cowboy, "~> 2.0"},
+      {:json, "~> 1.2"}
     ]
   end
 end

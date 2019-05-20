@@ -1,13 +1,9 @@
 defmodule Snelixir.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
 
   def start(_type, _args) do
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     Supervisor.start_link(
       [
         Plug.Cowboy.child_spec(
@@ -17,7 +13,8 @@ defmodule Snelixir.Application do
             port: Application.get_env(:snelixir, :port, 4000),
             dispatch: dispatch()
           ]
-        )
+        ),
+        Snelixir.Lobby
       ],
       strategy: :one_for_one,
       name: Snelixir.Application
@@ -25,12 +22,6 @@ defmodule Snelixir.Application do
   end
 
   defp dispatch() do
-    [
-      {:_,
-       [
-         {"/ws", Snelixir.Ws, %{}},
-         {:_, Plug.Cowboy.Handler, {Snelixir.Endpoint, []}}
-       ]}
-    ]
+    [{:_, [{"/", Snelixir.Ws, :init}]}]
   end
 end
