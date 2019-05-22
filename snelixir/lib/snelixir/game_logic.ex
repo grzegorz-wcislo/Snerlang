@@ -84,7 +84,7 @@ defmodule Snelixir.GameLogic do
 
     # return -> {new state, list of pids of dead snakes}
     #{board, []}
-    {updated_snakes_positions, updated_snakes_directions, apples}
+    {{updated_snakes_positions, updated_snakes_directions, apples}, []}
   end
 
   def remove_snake({segments, directions, apples}, snake) do 

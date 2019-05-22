@@ -4,10 +4,6 @@ defmodule Snelixir.Ws do
   ## Client API
 
   def message(snake, msg) do
-    # case JSON.encode(msg) do
-    #   {:ok, r} -> send(snake, {:send, r})
-    #   err -> IO.puts err
-    # end
     send(snake, {:send, msg})
   end
 

@@ -18,6 +18,8 @@ defmodule Snelixir.Game do
     IO.puts "Starting new game"
     IO.puts map_size(snakes)
 
+    Process.flag(:trap_exit, true)
+
     Map.keys(snakes)
     |> Enum.each(fn snake ->
       Process.link(snake)
@@ -25,7 +27,7 @@ defmodule Snelixir.Game do
     end)
 
     schedule_tick()
-    {:ok, Snelixir.GameLogic.init_board(snakes)}
+    {:ok, Snelixir.GameLogic.init_board(Map.keys(snakes))}
   end
 
   def handle_cast({:set_direction, snake, direction}, board) do
@@ -46,8 +48,16 @@ defmodule Snelixir.Game do
     {:noreply, board}
   end
 
-  def handle_info({:EXIT, _snake, _reason}, board) do
-    {:noreply, board}
+  def handle_info({:EXIT, snake, _reason}, board) do
+    IO.puts "Removing snake #{inspect snake}"
+    board = Snelixir.GameLogic.remove_snake(board, snake)
+    # WIP
+    if (board |> elem(0) |> map_size) == 0 do
+      IO.puts "Game is empty, exiting"
+      {:stop, :normal, board}
+    else
+      {:noreply, board}
+    end
   end
 
 
