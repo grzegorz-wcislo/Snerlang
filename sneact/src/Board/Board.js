@@ -29,8 +29,8 @@ export default ({ snakes, apples, webSocket }) => {
   });
 
   return (
-    <svg className="board" viewBox="-1 -1 23 23">
-      <Background size={21} />
+    <svg className="board" viewBox="-1 -1 25 25">
+      <Background size={23} />
       {apples.map(({ x, y }) => (
         <Apple key={`ap_${x}_${y}`} {...{ x, y }} />
       ))}

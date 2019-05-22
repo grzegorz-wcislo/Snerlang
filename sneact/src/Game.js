@@ -44,6 +44,8 @@ const response = {
   apples: [{ x: 2, y: 3 }, { x: 10, y: 7 }],
 };
 
+const emptyBoard = { snakes: [], apples: [] };
+
 const stateReducer = (state, action) => {
   switch (action.type) {
     case "RESET":
@@ -53,7 +55,9 @@ const stateReducer = (state, action) => {
     case "LOBBY":
       return { ...state, state: "LOBBY", count: action.count };
     case "GAME":
-      return { ...state, ws: action.ws, state: "GAME" };
+      return { ...state, ws: action.ws, board: emptyBoard, state: "GAME" };
+    case "BOARD":
+      return { ...state, board: action.board, state: "GAME" };
     case "WIN":
       return { ...state, state: "VICTORY" };
     case "LOSE":
@@ -73,13 +77,15 @@ export const GameContext = createContext(null);
 
 export default () => {
   const name = "";
-  const board = response;
 
   const [state, dispatchState] = useReducer(stateReducer, {
     name,
-    board,
+    emptyBoard,
     state: "LOGIN",
   });
+
+  // const board = response;
+  const board = state.board;
 
   const reset = () => {
     dispatchState({ type: "RESET" });

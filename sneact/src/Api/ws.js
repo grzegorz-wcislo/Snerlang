@@ -29,6 +29,10 @@ const handleMessage = (webSocket, { data }, dispatchState) => {
       dispatchState({ type: "GAME", ws: webSocket });
       break;
     case "board":
+      // TODO
+      const board = parseBoard(msg);
+      dispatchState({ type: "BOARD", board });
+      break;
       break;
     case "victory":
       dispatchState({ type: "WIN" });
@@ -39,6 +43,21 @@ const handleMessage = (webSocket, { data }, dispatchState) => {
     default:
       console.warn("Unknown message", data);
   }
+};
+
+const parseBoardMetadata = data => {
+  console.log(data);
+};
+
+const parseBoard = data => {
+  const { snakes, apples } = data;
+  const s = Object.keys(snakes).map(snake => {
+    return {
+      name: `Snake ${snake}`,
+      tail: snakes[snake].map(([x, y]) => ({ x, y })),
+    };
+  });
+  return { snakes: s, apples: [] };
 };
 
 const handleClose = dispatchState => {
