@@ -4,10 +4,11 @@ defmodule Snelixir.Ws do
   ## Client API
 
   def message(snake, msg) do
-    case JSON.encode(msg) do
-      {:ok, r} -> send(snake, {:send, r})
-      err -> IO.puts err
-    end
+    # case JSON.encode(msg) do
+    #   {:ok, r} -> send(snake, {:send, r})
+    #   err -> IO.puts err
+    # end
+    send(snake, {:send, msg})
   end
 
   ## Websocket Callbacks
@@ -25,7 +26,7 @@ defmodule Snelixir.Ws do
 
   def websocket_handle({:text, name}, :init) do
     reply = "Hi, #{name}!"
-    response = Snelixir.Lobby.add
+    response = Snelixir.Lobby.add(name)
 
     IO.puts response
     IO.puts reply
@@ -64,7 +65,10 @@ defmodule Snelixir.Ws do
 
 
   def websocket_info({:send, msg}, state) do
-    {:reply, {:text, msg}, state}
+    case JSON.encode(msg) do
+      {:ok, reply} -> {:reply, {:text, reply}, state}
+      {:error, reply} -> {:reply, {:text, reply}, state}
+    end
   end
 
 
