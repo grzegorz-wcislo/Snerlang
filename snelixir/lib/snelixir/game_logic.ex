@@ -86,10 +86,25 @@ defmodule Snelixir.GameLogic do
       direction = :front
       {id, direction}
     end
-
+    headList = for {id, body} <- updated_snakes_positions, into: [] do
+      {id, List.first(body)}
+    end
+    deadSnakes = Enum.filter(headList, fn el -> amount(el, updated_snakes_positions) end)
     # return -> {new state, list of pids of dead snakes}
     #{board, []}
-    {{updated_snakes_positions, updated_snakes_directions, apples}, []}
+    {{updated_snakes_positions, updated_snakes_directions, apples}, deadSnakes}
+  end
+
+  defp amount({id, value}, updated_snakes_positions) do
+    Acc = 0
+    for {snakeId, segment} <- updated_snakes_positions do
+      for cube <- segment do
+        if cube == value do
+          Acc = Acc + 1
+        end
+      end
+    end
+    Acc > 1
   end
 
   def remove_snake({segments, directions, apples}, snake) do 
