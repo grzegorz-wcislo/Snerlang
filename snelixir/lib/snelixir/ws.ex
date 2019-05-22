@@ -11,6 +11,11 @@ defmodule Snelixir.Ws do
     send(snake, {:send, msg})
   end
 
+  def start_game(game, snake, data) do
+    send(snake, {:start, game, data})
+  end
+
+
   ## Websocket Callbacks
 
   def init(req, opts) do
@@ -36,30 +41,21 @@ defmodule Snelixir.Ws do
     end
   end
 
-  def websocket_handle({:text, "l"}, :game) do
-    {:reply, {:text, "Going left"}, :game}
-  end
-
-  def websocket_handle({:text, "r"}, :game) do
-    {:reply, {:text, "Going right"}, :game}
-  end
-
-  def websocket_handle({:text, msg}, :lobby) when msg in ["l", "r", "u", "d"] do
-    reply =
+  def websocket_handle({:text, msg}, {:game, game}) when msg in ["f", "l", "r"] do
+    direction =
       case msg do
-        "l" -> "Snek #{inspect(self())} is going left"
-        "r" -> "Snek #{inspect(self())} is going right"
-        "u" -> "Snek #{inspect(self())} is going up"
-        "d" -> "Snek #{inspect(self())} is going down"
+        "f" -> :front
+        "l" -> :left
+        "r" -> :right
       end
 
-    IO.puts(reply)
-    {:ok, r} = JSON.encode(%{response: reply})
-    {:reply, {:text, r}, :lobby}
+    Snelixir.Game.set_direction(game, self(), direction)
+
+    {:reply, {:text, inspect(direction)}, {:game, game}}
   end
 
   def websocket_handle(inframe, state) do
-    IO.puts("Unknown message #{inspect inframe} in state '#{state}'")
+    IO.puts("Unknown WS message #{inspect inframe} in state '#{state}'")
     {:ok, state}
   end
 
@@ -69,6 +65,20 @@ defmodule Snelixir.Ws do
       {:ok, reply} -> {:reply, {:text, reply}, state}
       {:error, reply} -> {:reply, {:text, reply}, state}
     end
+  end
+
+  def websocket_info({:start, game, data}, :lobby) do
+    Process.flag(:trap_exit, true)
+
+    case JSON.encode(data) do
+      {:ok, reply} -> {:reply, {:text, reply}, {:game, game}}
+      {:error, reply} -> {:reply, {:text, reply}, {:game, game}}
+    end
+  end
+
+  def websocket_info({:EXIT, _game, _reason}, state) do
+    IO.puts "Game died"
+    {:stop, state}
   end
 
 

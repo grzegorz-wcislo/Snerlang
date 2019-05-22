@@ -7,21 +7,57 @@ defmodule Snelixir.Game do
     GenServer.start(__MODULE__, snakes)
   end
 
+  def set_direction(game, snake, direction) do
+    GenServer.cast(game, {:set_direction, snake, direction})
+  end
+
+
   ## Server Callbacks
 
   def init(snakes) do
     IO.puts "Starting new game"
     IO.puts map_size(snakes)
-    Process.flag(:trap_exit, true)
 
     Map.keys(snakes)
     |> Enum.each(fn snake ->
-      IO.puts "dupa"
-      # IO.puts snake
       Process.link(snake)
-      Snelixir.Ws.message(snake, "Starting game")
+      Snelixir.Ws.start_game(self(), snake, init_message(snakes))
     end)
 
+    schedule_tick()
     {:ok, Snelixir.GameLogic.init_board(snakes)}
+  end
+
+  def handle_cast({:set_direction, snake, direction}, board) do
+    {:noreply, Snelixir.GameLogic.set_direction(board, snake, direction)}
+  end
+
+
+  def handle_info(:tick, board) do
+    schedule_tick()
+    {board, _dead} = Snelixir.GameLogic.move_snakes(board)
+
+    board
+    |> elem(0)
+    |> Map.keys
+    |> Enum.each(fn snake -> Snelixir.Ws.message(snake, "Board") end)
+
+    IO.inspect board
+    {:noreply, board}
+  end
+
+  def handle_info({:EXIT, _snake, _reason}, board) do
+    {:noreply, board}
+  end
+
+
+  ## Helper Functions
+
+  defp init_message(snakes) do
+    %{snakes: snakes |> Map.to_list}
+  end
+
+  defp schedule_tick do
+    Process.send_after(self(), :tick, 1000)
   end
 end

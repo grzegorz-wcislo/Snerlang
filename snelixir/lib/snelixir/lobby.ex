@@ -19,21 +19,36 @@ defmodule Snelixir.Lobby do
   end
 
   def handle_call({:add, name}, {snake, _ref}, snakes) do
-    Process.link(snake)
+    snakes = add_snake(snakes, snake, name)
+
     Snelixir.Ws.message(snake, "Hello")
     IO.puts "Added #{inspect(snake)}"
-    newSnakes = Map.put(snakes, snake, name)
-    if map_size(newSnakes) == 2 do
-      Snelixir.Game.start(newSnakes)
+
+    if map_size(snakes) == 2 do
+      start_game(snakes)
       {:reply, :ok, %{}}
     else
-      {:reply, :ok, newSnakes}
+      {:reply, :ok, snakes}
     end
-
   end
 
   def handle_info({:EXIT, snake, _reason}, snakes) do
     IO.puts "EXITED and removed #{inspect(snake)}"
     {:noreply, Map.delete(snakes, snake)}
+  end
+
+  ## Helper Functions
+
+  defp add_snake(snakes, snake, name) do
+    Process.link(snake)
+    Map.put(snakes, snake, name)
+  end
+
+  defp start_game(snakes) do
+    Snelixir.Game.start(snakes)
+    Map.keys(snakes)
+    |> Enum.each(fn snake ->
+      Process.unlink(snake)
+    end)
   end
 end

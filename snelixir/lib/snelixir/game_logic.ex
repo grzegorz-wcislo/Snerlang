@@ -86,4 +86,20 @@ defmodule Snelixir.GameLogic do
     #{board, []}
     {updated_snakes_positions, updated_snakes_directions, apples}
   end
+
+  def remove_snake({segments, directions, apples}, snake) do 
+    {
+      Map.delete(segments, snake),
+      Map.delete(directions, snake),
+      apples
+    }
+  end
+
+  def set_direction({segments, directions, apples}, snake, direction) do
+    {
+      segments,
+      Map.put(directions, snake, direction),
+      apples
+    }
+  end
 end
