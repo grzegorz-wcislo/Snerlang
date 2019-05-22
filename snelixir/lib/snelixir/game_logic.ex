@@ -1,4 +1,5 @@
 defmodule Snelixir.GameLogic do
+
   def init_board(snakes) do
     # snakes - list of pids
     apples = []
@@ -21,6 +22,7 @@ defmodule Snelixir.GameLogic do
   end
 
   def move_snakes(board) do
+    length = 23
     {snakes_positions, snakes_directions, apples} = board
     # move snakes
     updated_snakes_positions = for snek <- snakes_positions, into: %{} do
@@ -32,59 +34,47 @@ defmodule Snelixir.GameLogic do
       neck |> IO.inspect(label: "neck")
       {x1, y1} = head
       {x2, y2} = neck
-      dx = x1 - x2
-      dy = y1 - y2
+      dx = case x1-x2 do
+        d when d > 1 -> d - length
+        d when d < -1 -> d + length
+        d -> d
+      end
+      dy = case y1-y2 do
+        dy when dy > 1 -> dy - length
+        dy when dy < -1 -> dy + length
+        dy -> dy
+      end
       dx |> IO.inspect(label: "dx")
       dy |> IO.inspect(label: "dy")
       body |> IO.inspect(label: "body before direction")
-      body = case direction do
+      newHead = case direction do
         :front ->
           case {dx, dy} do
-            {-1,0} ->
-              [{x1-1,y1} | List.delete(body, List.last(body))]
-            {1,0} ->
-              [{x1+1,y1} | List.delete(body, List.last(body))]
-            {0,-1} ->
-              [{x1,y1-1} | List.delete(body, List.last(body))]
-            {0,1} ->
-              #body |> IO.inspect(label: "body before change")
-              [{x1,y1+1} | List.delete(body, List.last(body))]
-              #body |> IO.inspect(label: "body after change")
+            {-1,0} -> {x1-1,y1}
+            {1,0} -> {x1+1,y1}
+            {0,-1} -> {x1,y1-1}
+            {0,1} -> {x1,y1+1}
           end
         :right ->
           case {dx, dy} do
-            {-1,0} ->
-              body = List.delete(body, List.last(body))
-              body = [{x1,y1-1} | body]
-            {1,0} ->
-              body = List.delete(body, List.last(body))
-              body = [{x1,y1+1} | body]
-            {0,-1} ->
-              body = List.delete(body, List.last(body))
-              body = [{x1+1,y1} | body]
-            {0,1} ->
-              body = List.delete(body, List.last(body))
-              body = [{x1-1,y1} | body]
+            {-1,0} -> {x1,y1-1}
+            {1,0} -> {x1,y1+1}
+            {0,-1} -> {x1+1,y1}
+            {0,1} -> {x1-1,y1}
           end
         :left ->
           case {dx, dy} do
-            {-1,0} ->
-              body = List.delete(body, List.last(body))
-              body = [{x1,y1+1} | body]
-            {1,0} ->
-              body = List.delete(body, List.last(body))
-              body = [{x1,y1-1} | body]
-            {0,-1} ->
-              body = List.delete(body, List.last(body))
-              body = [{x1+1,y1} | body]
-            {0,1} ->
-              body = List.delete(body, List.last(body))
-              body = [{x1-1,y1} | body]
+            {-1,0} -> {x1,y1+1}
+            {1,0} -> {x1,y1-1}
+            {0,-1} -> {x1+1,y1}
+            {0,1} -> {x1-1,y1}
           end
-
       end
-      body |> IO.inspect(label: "body after direction")
-      {id, body}
+
+      newHead |> IO.inspect(label: "body after direction")
+      {newx,newy} = newHead
+      newHead = {rem(newx  + length,length), rem(newy  + length,length)}
+      {id, [newHead | List.delete(body, List.last(body))]}
     end
     updated_snakes_directions = for snek <- snakes_directions, into: %{} do
       {id, direction} = snek
