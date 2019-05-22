@@ -34,8 +34,8 @@ export default ({ snakes, apples, webSocket }) => {
       {apples.map(({ x, y }) => (
         <Apple key={`ap_${x}_${y}`} {...{ x, y }} />
       ))}
-      {snakes.map(({ name, tail }) => (
-        <Snake key={name} {...{ name, tail }} />
+      {snakes.map(({ id, name, tail }) => (
+        <Snake key={id} {...{ name, tail }} />
       ))}
     </svg>
   );

@@ -1,15 +1,5 @@
 const host = process.env.REACT_APP_WS_HOST;
 
-export const test = () => {
-  const webSocket = new WebSocket(host);
-
-  setTimeout(() => webSocket.send("Dupa 123"), 100);
-
-  webSocket.onmessage = ({ data }) => {
-    console.log(data);
-  };
-};
-
 export const openConnection = (name, dispatchState) => {
   const webSocket = new WebSocket(host);
   webSocket.onopen = () => webSocket.send(name);
@@ -17,6 +7,8 @@ export const openConnection = (name, dispatchState) => {
   webSocket.onclose = () => handleClose(dispatchState);
   webSocket.onerror = () => handleError(dispatchState);
 };
+
+let parseBoard = () => ({ snakes: [], apples: [] });
 
 const handleMessage = (webSocket, { data }, dispatchState) => {
   const msg = JSON.parse(data);
@@ -26,13 +18,12 @@ const handleMessage = (webSocket, { data }, dispatchState) => {
       dispatchState({ type: "LOBBY", count: msg.count });
       break;
     case "init_game":
+      parseBoard = parseBoardCreate(msg);
       dispatchState({ type: "GAME", ws: webSocket });
       break;
     case "board":
-      // TODO
       const board = parseBoard(msg);
       dispatchState({ type: "BOARD", board });
-      break;
       break;
     case "victory":
       dispatchState({ type: "WIN" });
@@ -49,15 +40,20 @@ const parseBoardMetadata = data => {
   console.log(data);
 };
 
-const parseBoard = data => {
-  const { snakes, apples } = data;
-  const s = Object.keys(snakes).map(snake => {
-    return {
-      name: `Snake ${snake}`,
-      tail: snakes[snake].map(([x, y]) => ({ x, y })),
-    };
-  });
-  return { snakes: s, apples: [] };
+const parseBoardCreate = ({ snakes: snakeNames }) => {
+  console.log(snakeNames);
+
+  return msg => {
+    const { snakes, apples } = msg;
+    const s = Object.keys(snakes).map(snake => {
+      return {
+        id: snake,
+        name: snakeNames[snake],
+        tail: snakes[snake].map(([x, y]) => ({ x, y })),
+      };
+    });
+    return { snakes: s, apples: [] };
+  };
 };
 
 const handleClose = dispatchState => {
