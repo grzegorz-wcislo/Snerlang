@@ -7,8 +7,8 @@ defmodule Snelixir.WsPresenter do
     JSON.encode!(%{type: :init_game, snakes: snakes})
   end
 
-  def board_msg(board) do
-    JSON.encode!(%{type: :board, board: board})
+  def board_msg({snakes, _, apples}) do
+    JSON.encode!(%{type: :board, snakes: snakes, apples: apples})
   end
 
   def win_msg do

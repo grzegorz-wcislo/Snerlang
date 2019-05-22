@@ -5,6 +5,7 @@ import Board from "./Board";
 import Victory from "./Victory";
 import Defeat from "./Defeat";
 import Error from "./Error";
+import { openConnection } from "./Api/ws.js";
 
 const response = {
   snakes: [
@@ -43,21 +44,31 @@ const response = {
   apples: [{ x: 2, y: 3 }, { x: 10, y: 7 }],
 };
 
+const emptyBoard = { snakes: [], apples: [] };
+
 const stateReducer = (state, action) => {
   switch (action.type) {
     case "RESET":
       return { ...state, state: "LOGIN" };
     case "LOGIN":
       return { ...state, name: action.name, state: "LOADING" };
+    case "LOBBY":
+      return { ...state, state: "LOBBY", count: action.count };
     case "GAME":
-      return { ...state, ws: action.ws, state: "GAME" };
+      return { ...state, ws: action.ws, board: emptyBoard, state: "GAME" };
+    case "BOARD":
+      return { ...state, board: action.board, state: "GAME" };
     case "WIN":
       return { ...state, state: "VICTORY" };
     case "LOSE":
       return { ...state, state: "DEFEAT" };
+    case "WS_CLOSE":
+      if (state.state === "VICTORY" || state.state === "DEFEAT") return state;
+      return { ...state, msg: action.msg, state: "ERROR" };
     case "ERROR":
       return { ...state, msg: action.msg, state: "ERROR" };
     default:
+      console.warn(`Unknown action: ${action}`);
       return { ...state, state: "ERROR" };
   }
 };
@@ -66,19 +77,22 @@ export const GameContext = createContext(null);
 
 export default () => {
   const name = "";
-  const board = response;
 
   const [state, dispatchState] = useReducer(stateReducer, {
     name,
-    board,
+    emptyBoard,
     state: "LOGIN",
   });
+
+  // const board = response;
+  const board = state.board;
 
   const reset = () => {
     dispatchState({ type: "RESET" });
   };
 
   const login = name => {
+    openConnection(name, dispatchState);
     dispatchState({ type: "LOGIN", name });
   };
 
@@ -109,10 +123,12 @@ export default () => {
         return <Login {...{ name }} />;
       case "LOADING":
         return <Loading />;
+      case "LOBBY":
+        return <p>{state.count}</p>;
       case "GAME":
         return (
           <>
-            <Board {...board} />
+            <Board {...board} webSocket={state.ws} />
             <button onClick={win}>Win</button>
             <button onClick={lose}>Lose</button>
           </>

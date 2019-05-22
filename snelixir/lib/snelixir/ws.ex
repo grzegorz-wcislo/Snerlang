@@ -45,7 +45,7 @@ defmodule Snelixir.Ws do
 
   def websocket_init(state) do
     Logger.info "#{inspect(self())}: New client connected"
-    {:reply, {:text, "Connected"}, state}
+    {:ok, state}
   end
 
 
