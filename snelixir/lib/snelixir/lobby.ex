@@ -1,5 +1,6 @@
 defmodule Snelixir.Lobby do
   use GenServer
+  require Logger
 
   ## Client API
 
@@ -21,7 +22,7 @@ defmodule Snelixir.Lobby do
   def handle_call({:add, name}, {snake, _ref}, snakes) do
     snakes = add_snake(snakes, snake, name)
 
-    IO.puts "Added #{inspect(snake)}"
+    Logger.info "Added #{inspect(snake)} to lobby"
     notify_snakes(Map.keys(snakes))
 
     if map_size(snakes) == 2 do
@@ -33,7 +34,7 @@ defmodule Snelixir.Lobby do
   end
 
   def handle_info({:EXIT, snake, _reason}, snakes) do
-    IO.puts "EXITED and removed #{inspect(snake)}"
+    Logger.info "Removed #{inspect(snake)} from lobby"
     notify_snakes(Map.keys(snakes))
     {:noreply, Map.delete(snakes, snake)}
   end
@@ -50,6 +51,7 @@ defmodule Snelixir.Lobby do
   end
 
   defp start_game(snakes) do
+    Logger.info "Starting a new game"
     Snelixir.Game.start(snakes)
     Map.keys(snakes)
     |> Enum.each(fn snake ->

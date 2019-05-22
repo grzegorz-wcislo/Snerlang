@@ -1,5 +1,6 @@
 defmodule Snelixir.Game do
   use GenServer
+  require Logger
 
   ## Client API
 
@@ -15,8 +16,7 @@ defmodule Snelixir.Game do
   ## Server Callbacks
 
   def init(snakes) do
-    IO.puts "Starting new game"
-    IO.puts map_size(snakes)
+    Logger.info "Starting new game"
 
     Process.flag(:trap_exit, true)
 
@@ -37,27 +37,32 @@ defmodule Snelixir.Game do
 
   def handle_info(:tick, board) do
     schedule_tick()
-    {board, _dead} = Snelixir.GameLogic.move_snakes(board)
+    {board, dead} = Snelixir.GameLogic.move_snakes(board)
 
-    board
-    |> elem(0)
-    |> Map.keys
-    |> Enum.each(fn snake -> Snelixir.Ws.board(snake, board) end)
+    Enum.each(dead, fn snake -> Snelixir.Ws.lose(snake) end)
 
-    IO.inspect board
-    {:noreply, board}
+    case board |> elem(0) |> Map.keys do
+      [] ->
+        Logger.info "Game is empty, exiting"
+        {:stop, :normal, board}
+      [snake] ->
+        Logger.info "Game is won, exiting"
+        Snelixir.Ws.win(snake)
+        {:stop, :normal, board}
+      _ ->
+        board
+        |> elem(0)
+        |> Map.keys
+        |> Enum.each(fn snake -> Snelixir.Ws.board(snake, board) end)
+
+        {:noreply, board}
+    end
   end
 
   def handle_info({:EXIT, snake, _reason}, board) do
-    IO.puts "Removing snake #{inspect snake}"
+    Logger.info "Removing snake #{inspect snake}"
     board = Snelixir.GameLogic.remove_snake(board, snake)
-    # WIP
-    if (board |> elem(0) |> map_size) == 0 do
-      IO.puts "Game is empty, exiting"
-      {:stop, :normal, board}
-    else
-      {:noreply, board}
-    end
+    {:noreply, board}
   end
 
 

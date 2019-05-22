@@ -12,8 +12,10 @@ defmodule Snelixir.WsPresenter do
   end
 
   def win_msg do
+    JSON.encode!(%{type: :victory, msg: "You won"})
   end
 
   def lose_msg do
+    JSON.encode!(%{type: :defeat, msg: "You have been pwned"})
   end
 end

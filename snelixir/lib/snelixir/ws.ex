@@ -1,5 +1,6 @@
 defmodule Snelixir.Ws do
   @behaviour :cowboy_websocket
+  require Logger
 
   ## Client API
 
@@ -22,6 +23,18 @@ defmodule Snelixir.Ws do
     send(snake, {:send, msg})
   end
 
+  def win(snake) do
+    msg = Snelixir.WsPresenter.win_msg
+    send(snake, {:send, msg})
+    send(snake, :stop)
+  end
+
+  def lose(snake) do
+    msg = Snelixir.WsPresenter.lose_msg
+    send(snake, {:send, msg})
+    send(snake, :stop)
+  end
+
 
   ## Websocket Callbacks
 
@@ -31,38 +44,28 @@ defmodule Snelixir.Ws do
 
 
   def websocket_init(state) do
-    IO.puts("#{inspect(self())}: New client connected, #{inspect(state)}")
+    Logger.info "#{inspect(self())}: New client connected"
     {:reply, {:text, "Connected"}, state}
   end
 
 
   def websocket_handle({:text, name}, :init) do
-    reply = "Hi, #{name}!"
-    response = Snelixir.Lobby.add(name)
-
-    IO.puts response
-    IO.puts reply
-
-    case JSON.encode(%{response: reply}) do
-      {:ok, r} -> {:reply, {:text, r}, :lobby}
-    end
+    Snelixir.Lobby.add(name)
+    {:ok, :lobby}
   end
 
   def websocket_handle({:text, msg}, {:game, game}) when msg in ["f", "l", "r"] do
-    direction =
-      case msg do
-        "f" -> :front
-        "l" -> :left
-        "r" -> :right
-      end
-
+    direction = case msg do
+                  "f" -> :front
+                  "l" -> :left
+                  "r" -> :right
+                end
     Snelixir.Game.set_direction(game, self(), direction)
-
-    {:reply, {:text, inspect(direction)}, {:game, game}}
+    {:ok, {:game, game}}
   end
 
   def websocket_handle(inframe, state) do
-    IO.puts("Unknown WS message #{inspect inframe} in state '#{inspect state}'")
+    Logger.warn "Unknown WS message #{inspect inframe} in state '#{inspect state}'"
     {:ok, state}
   end
 
@@ -77,13 +80,20 @@ defmodule Snelixir.Ws do
   end
 
   def websocket_info({:EXIT, _game, _reason}, state) do
-    IO.puts "Game died"
+    {:stop, state}
+  end
+
+  def websocket_info(:stop, state) do
     {:stop, state}
   end
 
 
-  def terminate(_reason, _req, _state) do
-    IO.puts("#{inspect(self())}: Client disconnected")
+  def terminate(reason, _req, _state) do
+    case reason do
+      :stop -> Logger.info "#{inspect self()}: Client stopped"
+      :remote -> Logger.info "#{inspect self()}: Client disconnected"
+      _ -> Logger.warn "#{inspect self()}: Client disconnected, reason: #{inspect reason}"
+    end
     :ok
   end
 end
