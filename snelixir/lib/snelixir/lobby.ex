@@ -21,8 +21,8 @@ defmodule Snelixir.Lobby do
   def handle_call({:add, name}, {snake, _ref}, snakes) do
     snakes = add_snake(snakes, snake, name)
 
-    Snelixir.Ws.message(snake, "Hello")
     IO.puts "Added #{inspect(snake)}"
+    notify_snakes(Map.keys(snakes))
 
     if map_size(snakes) == 2 do
       start_game(snakes)
@@ -34,6 +34,7 @@ defmodule Snelixir.Lobby do
 
   def handle_info({:EXIT, snake, _reason}, snakes) do
     IO.puts "EXITED and removed #{inspect(snake)}"
+    notify_snakes(Map.keys(snakes))
     {:noreply, Map.delete(snakes, snake)}
   end
 
@@ -42,6 +43,10 @@ defmodule Snelixir.Lobby do
   defp add_snake(snakes, snake, name) do
     Process.link(snake)
     Map.put(snakes, snake, name)
+  end
+
+  defp notify_snakes(snakes) do
+    Enum.each(snakes, fn snake -> Snelixir.Ws.lobby(snake, length(snakes)) end)
   end
 
   defp start_game(snakes) do

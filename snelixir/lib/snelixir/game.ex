@@ -21,7 +21,7 @@ defmodule Snelixir.Game do
     Map.keys(snakes)
     |> Enum.each(fn snake ->
       Process.link(snake)
-      Snelixir.Ws.start_game(self(), snake, init_message(snakes))
+      Snelixir.Ws.start_game(self(), snake, {snakes})
     end)
 
     schedule_tick()
@@ -40,7 +40,7 @@ defmodule Snelixir.Game do
     board
     |> elem(0)
     |> Map.keys
-    |> Enum.each(fn snake -> Snelixir.Ws.message(snake, "Board") end)
+    |> Enum.each(fn snake -> Snelixir.Ws.board(snake, board) end)
 
     IO.inspect board
     {:noreply, board}
@@ -52,10 +52,6 @@ defmodule Snelixir.Game do
 
 
   ## Helper Functions
-
-  defp init_message(snakes) do
-    %{snakes: snakes |> Map.to_list}
-  end
 
   defp schedule_tick do
     Process.send_after(self(), :tick, 1000)

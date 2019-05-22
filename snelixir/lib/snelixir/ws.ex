@@ -11,8 +11,19 @@ defmodule Snelixir.Ws do
     send(snake, {:send, msg})
   end
 
+  def lobby(snake, count) do
+    msg = Snelixir.WsPresenter.lobby_message(count)
+    send(snake, {:send, msg})
+  end
+
   def start_game(game, snake, data) do
-    send(snake, {:start, game, data})
+    msg = Snelixir.WsPresenter.game_init_msg(data)
+    send(snake, {:start, game, msg})
+  end
+
+  def board(snake, board) do
+    msg = Snelixir.WsPresenter.board_msg(board)
+    send(snake, {:send, msg})
   end
 
 
@@ -55,25 +66,18 @@ defmodule Snelixir.Ws do
   end
 
   def websocket_handle(inframe, state) do
-    IO.puts("Unknown WS message #{inspect inframe} in state '#{state}'")
+    IO.puts("Unknown WS message #{inspect inframe} in state '#{inspect state}'")
     {:ok, state}
   end
 
 
   def websocket_info({:send, msg}, state) do
-    case JSON.encode(msg) do
-      {:ok, reply} -> {:reply, {:text, reply}, state}
-      {:error, reply} -> {:reply, {:text, reply}, state}
-    end
+    {:reply, {:text, msg}, state}
   end
 
-  def websocket_info({:start, game, data}, :lobby) do
+  def websocket_info({:start, game, msg}, :lobby) do
     Process.flag(:trap_exit, true)
-
-    case JSON.encode(data) do
-      {:ok, reply} -> {:reply, {:text, reply}, {:game, game}}
-      {:error, reply} -> {:reply, {:text, reply}, {:game, game}}
-    end
+    {:reply, {:text, msg}, {:game, game}}
   end
 
   def websocket_info({:EXIT, _game, _reason}, state) do
