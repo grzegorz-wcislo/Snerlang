@@ -36,10 +36,6 @@ const handleMessage = (webSocket, { data }, dispatchState) => {
   }
 };
 
-const parseBoardMetadata = data => {
-  console.log(data);
-};
-
 const parseBoardCreate = ({ snakes: snakeNames }) => {
   console.log(snakeNames);
 
@@ -52,7 +48,8 @@ const parseBoardCreate = ({ snakes: snakeNames }) => {
         tail: snakes[snake].map(([x, y]) => ({ x, y })),
       };
     });
-    return { snakes: s, apples: [] };
+    const a = apples.map(([x, y]) => ({ x, y }));
+    return { snakes: s, apples: a };
   };
 };
 

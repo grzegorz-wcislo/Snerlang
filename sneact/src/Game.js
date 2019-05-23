@@ -7,42 +7,42 @@ import Defeat from "./Defeat";
 import Error from "./Error";
 import { openConnection } from "./Api/ws.js";
 
-const response = {
-  snakes: [
-    {
-      name: "Snek1",
-      tail: [
-        { x: 20, y: 2 },
-        { x: 0, y: 2 },
-        { x: 1, y: 2 },
-        { x: 1, y: 3 },
-        { x: 1, y: 4 },
-        { x: 2, y: 4 },
-      ],
-    },
-    {
-      name: "Snek2",
-      tail: [
-        { x: 10, y: 0 },
-        { x: 10, y: 1 },
-        { x: 10, y: 2 },
-        { x: 10, y: 3 },
-        { x: 10, y: 4 },
-        { x: 10, y: 5 },
-      ],
-    },
-    {
-      name: "Snek3",
-      tail: [
-        { x: 1, y: 20 },
-        { x: 1, y: 19 },
-        { x: 2, y: 19 },
-        { x: 3, y: 19 },
-      ],
-    },
-  ],
-  apples: [{ x: 2, y: 3 }, { x: 10, y: 7 }],
-};
+// const response = {
+//   snakes: [
+//     {
+//       name: "Snek1",
+//       tail: [
+//         { x: 20, y: 2 },
+//         { x: 0, y: 2 },
+//         { x: 1, y: 2 },
+//         { x: 1, y: 3 },
+//         { x: 1, y: 4 },
+//         { x: 2, y: 4 },
+//       ],
+//     },
+//     {
+//       name: "Snek2",
+//       tail: [
+//         { x: 10, y: 0 },
+//         { x: 10, y: 1 },
+//         { x: 10, y: 2 },
+//         { x: 10, y: 3 },
+//         { x: 10, y: 4 },
+//         { x: 10, y: 5 },
+//       ],
+//     },
+//     {
+//       name: "Snek3",
+//       tail: [
+//         { x: 1, y: 20 },
+//         { x: 1, y: 19 },
+//         { x: 2, y: 19 },
+//         { x: 3, y: 19 },
+//       ],
+//     },
+//   ],
+//   apples: [{ x: 2, y: 3 }, { x: 10, y: 7 }],
+// };
 
 const emptyBoard = { snakes: [], apples: [] };
 
