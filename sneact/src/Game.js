@@ -96,18 +96,6 @@ export default () => {
     dispatchState({ type: "LOGIN", name });
   };
 
-  const startGame = ws => {
-    dispatchState({ type: "GAME", ws });
-  };
-
-  const win = () => {
-    dispatchState({ type: "WIN" });
-  };
-
-  const lose = () => {
-    dispatchState({ type: "LOSE" });
-  };
-
   const registerError = msg => {
     dispatchState({ type: "ERROR", msg });
   };
@@ -126,13 +114,7 @@ export default () => {
       case "LOBBY":
         return <p>{state.count}</p>;
       case "GAME":
-        return (
-          <>
-            <Board {...board} webSocket={state.ws} />
-            <button onClick={win}>Win</button>
-            <button onClick={lose}>Lose</button>
-          </>
-        );
+      return <Board {...board} webSocket={state.ws} />;
       case "VICTORY":
         return <Victory />;
       case "DEFEAT":
@@ -148,7 +130,7 @@ export default () => {
   return (
     <>
       <GameContext.Provider
-        value={{ reset, login, startGame, win, lose, registerError }}
+        value={{ reset, login, registerError }}
       >
         {component(state.state)}
       </GameContext.Provider>
