@@ -1,6 +1,7 @@
 import React, { useEffect, useReducer, createContext } from "react";
 import Login from "./Login";
 import Loading from "./Loading";
+import Lobby from "./Lobby";
 import Board from "./Board";
 import Victory from "./Victory";
 import Defeat from "./Defeat";
@@ -112,9 +113,9 @@ export default () => {
       case "LOADING":
         return <Loading />;
       case "LOBBY":
-        return <p>{state.count}</p>;
+      return <Lobby count={state.count} fullCount={2}/>;
       case "GAME":
-      return <Board {...board} webSocket={state.ws} />;
+        return <Board {...board} webSocket={state.ws} />;
       case "VICTORY":
         return <Victory />;
       case "DEFEAT":
@@ -129,9 +130,7 @@ export default () => {
 
   return (
     <>
-      <GameContext.Provider
-        value={{ reset, login, registerError }}
-      >
+      <GameContext.Provider value={{ reset, login, registerError }}>
         {component(state.state)}
       </GameContext.Provider>
     </>

@@ -5,10 +5,10 @@ export default ({ msg }) => {
   const { reset } = useContext(GameContext);
 
   return (
-    <>
-      <p>Something went wrong!</p>
+    <div className="page">
+      <h1>Something went wrong!</h1>
       <p>{msg}</p>
       <button onClick={reset}>Restart</button>
-    </>
+    </div>
   );
 };

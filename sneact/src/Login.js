@@ -16,11 +16,9 @@ export default ({ name: initialName }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Name:
-        <input type="text" value={name} onChange={handleNameChange} />
-      </label>
+    <form className="page" onSubmit={handleSubmit}>
+      <label htmlFor="name">Please name your snake</label>
+        <input type="text" id="name" value={name} onChange={handleNameChange} />
       <input type="submit" value="Start" />
     </form>
   );
