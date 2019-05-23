@@ -2,10 +2,8 @@ import React, { useEffect, useReducer, createContext } from "react";
 import Login from "./Login";
 import Loading from "./Loading";
 import Lobby from "./Lobby";
+import Notification from "./Notification";
 import Board from "./Board";
-import Victory from "./Victory";
-import Defeat from "./Defeat";
-import Error from "./Error";
 import { openConnection } from "./Api/ws.js";
 
 // const response = {
@@ -48,45 +46,52 @@ import { openConnection } from "./Api/ws.js";
 const emptyBoard = { snakes: [], apples: [] };
 
 const stateReducer = (state, action) => {
+  console.log(action);
   switch (action.type) {
     case "RESET":
       return { ...state, state: "LOGIN" };
     case "LOGIN":
       return { ...state, name: action.name, state: "LOADING" };
     case "LOBBY":
-      return { ...state, state: "LOBBY", count: action.count };
+      return { ...state, count: action.count, state: "LOBBY" };
     case "GAME":
-      return { ...state, ws: action.ws, board: emptyBoard, state: "GAME" };
+      return {
+        ...state,
+        webSocket: action.webSocket,
+        board: emptyBoard,
+        state: "GAME",
+      };
     case "BOARD":
       return { ...state, board: action.board, state: "GAME" };
-    case "WIN":
-      return { ...state, state: "VICTORY" };
-    case "LOSE":
-      return { ...state, state: "DEFEAT" };
     case "WS_CLOSE":
-      if (state.state === "VICTORY" || state.state === "DEFEAT") return state;
-      return { ...state, msg: action.msg, state: "ERROR" };
-    case "ERROR":
-      return { ...state, msg: action.msg, state: "ERROR" };
+      if (state.state === "NOTIFICATION") return state;
+      return {
+        ...state,
+        header: "Connection Closed",
+        msg: action.msg,
+        state: "NOTIFICATION",
+      };
+    case "NOTIFY":
+      return {
+        ...state,
+        header: action.header,
+        msg: action.msg,
+        state: "NOTIFICATION",
+      };
     default:
       console.warn(`Unknown action: ${action}`);
-      return { ...state, state: "ERROR" };
+      return state;
   }
 };
 
 export const GameContext = createContext(null);
 
 export default () => {
-  const name = "";
-
   const [state, dispatchState] = useReducer(stateReducer, {
-    name,
-    emptyBoard,
+    name: "",
+    board: emptyBoard,
     state: "LOGIN",
   });
-
-  // const board = response;
-  const board = state.board;
 
   const reset = () => {
     dispatchState({ type: "RESET" });
@@ -98,7 +103,7 @@ export default () => {
   };
 
   const registerError = msg => {
-    dispatchState({ type: "ERROR", msg });
+    dispatchState({ type: "NOTIFY", msg, header: "Error" });
   };
 
   useEffect(() => {
@@ -113,18 +118,17 @@ export default () => {
       case "LOADING":
         return <Loading />;
       case "LOBBY":
-      return <Lobby count={state.count} fullCount={2}/>;
+        const { count } = state;
+        const fullCount = 2;
+        return <Lobby {...{ count, fullCount }} />;
       case "GAME":
-        return <Board {...board} webSocket={state.ws} />;
-      case "VICTORY":
-        return <Victory />;
-      case "DEFEAT":
-        return <Defeat />;
-      case "ERROR":
-        const { msg } = state;
-        return <Error {...{ msg }} />;
+        const { board, webSocket } = state;
+        return <Board {...{ ...board, webSocket }} />;
+      case "NOTIFICATION":
+        const { msg, header } = state;
+        return <Notification {...{ msg, header }} />;
       default:
-        return <Error msg="Something went very wrong" />;
+        return <Notification header="Error" msg="Something went very wrong" />;
     }
   };
 

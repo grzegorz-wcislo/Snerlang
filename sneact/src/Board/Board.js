@@ -44,13 +44,10 @@ export default ({ snakes, apples, webSocket }) => {
       const { width, height } = svg.getBoundingClientRect();
 
       if (clientX - clientY > 0 && clientX + clientY < height) {
-        console.log("Going forward");
         webSocket.send("f");
       } else if (clientX < width / 2) {
-        console.log("Going left");
         webSocket.send("l");
       } else {
-        console.log("Going right");
         webSocket.send("r");
       }
     };

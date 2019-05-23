@@ -19,17 +19,17 @@ const handleMessage = (webSocket, { data }, dispatchState) => {
       break;
     case "init_game":
       parseBoard = parseBoardCreate(msg);
-      dispatchState({ type: "GAME", ws: webSocket });
+      dispatchState({ type: "GAME", webSocket });
       break;
     case "board":
       const board = parseBoard(msg);
       dispatchState({ type: "BOARD", board });
       break;
     case "victory":
-      dispatchState({ type: "WIN" });
+      dispatchState({ type: "NOTIFY", header: "Victory Royale" });
       break;
     case "defeat":
-      dispatchState({ type: "LOSE" });
+      dispatchState({ type: "NOTIFY", header: "Defeat Rustique" });
       break;
     default:
       console.warn("Unknown message", data);
