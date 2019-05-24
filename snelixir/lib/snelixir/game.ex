@@ -12,11 +12,10 @@ defmodule Snelixir.Game do
     GenServer.cast(game, {:set_direction, snake, direction})
   end
 
-
   ## Server Callbacks
 
   def init(snakes) do
-    Logger.info "Starting new game"
+    Logger.info("Starting new game")
 
     Process.flag(:trap_exit, true)
 
@@ -34,25 +33,26 @@ defmodule Snelixir.Game do
     {:noreply, Snelixir.GameLogic.set_direction(board, snake, direction)}
   end
 
-
   def handle_info(:tick, board) do
     schedule_tick()
     {board, dead} = Snelixir.GameLogic.move_snakes(board)
 
     Enum.each(dead, fn snake -> Snelixir.Ws.lose(snake) end)
 
-    case board |> elem(0) |> Map.keys do
+    case board |> elem(0) |> Map.keys() do
       [] ->
-        Logger.info "Game is empty, exiting"
+        Logger.info("Game is empty, exiting")
         {:stop, :normal, board}
+
       [snake] ->
-        Logger.info "Game is won, exiting"
+        Logger.info("Game is won, exiting")
         Snelixir.Ws.win(snake)
         {:stop, :normal, board}
+
       _ ->
         board
         |> elem(0)
-        |> Map.keys
+        |> Map.keys()
         |> Enum.each(fn snake -> Snelixir.Ws.board(snake, board) end)
 
         {:noreply, board}
@@ -60,11 +60,10 @@ defmodule Snelixir.Game do
   end
 
   def handle_info({:EXIT, snake, _reason}, board) do
-    Logger.info "Removing snake #{inspect snake}"
+    Logger.info("Removing snake #{inspect(snake)}")
     board = Snelixir.GameLogic.remove_snake(board, snake)
     {:noreply, board}
   end
-
 
   ## Helper Functions
 

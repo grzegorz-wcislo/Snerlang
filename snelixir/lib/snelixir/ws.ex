@@ -24,17 +24,16 @@ defmodule Snelixir.Ws do
   end
 
   def win(snake) do
-    msg = Snelixir.WsPresenter.win_msg
+    msg = Snelixir.WsPresenter.win_msg()
     send(snake, {:send, msg})
     send(snake, :stop)
   end
 
   def lose(snake) do
-    msg = Snelixir.WsPresenter.lose_msg
+    msg = Snelixir.WsPresenter.lose_msg()
     send(snake, {:send, msg})
     send(snake, :stop)
   end
-
 
   ## Websocket Callbacks
 
@@ -42,12 +41,10 @@ defmodule Snelixir.Ws do
     {:cowboy_websocket, req, opts}
   end
 
-
   def websocket_init(state) do
-    Logger.info "#{inspect(self())}: New client connected"
+    Logger.info("#{inspect(self())}: New client connected")
     {:ok, state}
   end
-
 
   def websocket_handle({:text, name}, :init) do
     Snelixir.Lobby.add(name)
@@ -55,30 +52,31 @@ defmodule Snelixir.Ws do
   end
 
   def websocket_handle({:text, msg}, {:game, game}) when msg in ["f", "l", "r"] do
-    direction = case msg do
-                  "f" -> :front
-                  "l" -> :left
-                  "r" -> :right
-                end
+    direction =
+      case msg do
+        "f" -> :front
+        "l" -> :left
+        "r" -> :right
+      end
+
     Snelixir.Game.set_direction(game, self(), direction)
     {:ok, {:game, game}}
   end
 
   def websocket_handle({:text, msg}, state) do
-    Logger.warn "Unknown WS message #{inspect msg} in state '#{inspect state}'"
+    Logger.warn("Unknown WS message #{inspect(msg)} in state '#{inspect(state)}'")
     {:ok, state}
   end
 
   def websocket_handle(:ping, state) do
-    Logger.debug "Empty ping received"
+    Logger.debug("Empty ping received")
     {:reply, :pong, state}
   end
 
   def websocket_handle({:ping, msg}, state) do
-    Logger.debug "Ping with message '#{msg}'received"
+    Logger.debug("Ping with message '#{msg}'received")
     {:reply, :pong, state}
   end
-
 
   def websocket_info({:send, msg}, state) do
     {:reply, {:text, msg}, state}
@@ -97,13 +95,13 @@ defmodule Snelixir.Ws do
     {:stop, state}
   end
 
-
   def terminate(reason, _req, _state) do
     case reason do
-      :stop -> Logger.info "#{inspect self()}: Client stopped"
-      :remote -> Logger.info "#{inspect self()}: Client disconnected"
-      _ -> Logger.warn "#{inspect self()}: Client disconnected, reason: #{inspect reason}"
+      :stop -> Logger.info("#{inspect(self())}: Client stopped")
+      :remote -> Logger.info("#{inspect(self())}: Client disconnected")
+      _ -> Logger.warn("#{inspect(self())}: Client disconnected, reason: #{inspect(reason)}")
     end
+
     :ok
   end
 end

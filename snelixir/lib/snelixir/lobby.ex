@@ -22,10 +22,10 @@ defmodule Snelixir.Lobby do
   def handle_call({:add, name}, {snake, _ref}, snakes) do
     snakes = add_snake(snakes, snake, name)
 
-    Logger.info "Added #{inspect(snake)} to lobby"
+    Logger.info("Added #{inspect(snake)} to lobby")
     notify_snakes(Map.keys(snakes))
 
-    if map_size(snakes) == Snelixir.GameLogic.max_snake_count do
+    if map_size(snakes) == Snelixir.GameLogic.max_snake_count() do
       start_game(snakes)
       {:reply, :ok, %{}}
     else
@@ -34,7 +34,7 @@ defmodule Snelixir.Lobby do
   end
 
   def handle_info({:EXIT, snake, _reason}, snakes) do
-    Logger.info "Removed #{inspect(snake)} from lobby"
+    Logger.info("Removed #{inspect(snake)} from lobby")
     notify_snakes(Map.keys(snakes))
     {:noreply, Map.delete(snakes, snake)}
   end
@@ -51,8 +51,9 @@ defmodule Snelixir.Lobby do
   end
 
   defp start_game(snakes) do
-    Logger.info "Starting a new game"
+    Logger.info("Starting a new game")
     Snelixir.Game.start(snakes)
+
     Map.keys(snakes)
     |> Enum.each(fn snake ->
       Process.unlink(snake)
