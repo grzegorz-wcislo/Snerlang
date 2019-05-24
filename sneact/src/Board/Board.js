@@ -19,7 +19,12 @@ const transposeBoard = ({ snakes, apples, boardSize, id }) => {
     your: id === snake.id,
   }));
 
-  return { snakes: s, apples };
+  const a = apples.map(({ x, y }) => ({
+    x: Math.floor(x - cX + 1.5 * boardSize) % boardSize,
+    y: Math.floor(y - cY + 1.5 * boardSize) % boardSize,
+  }));
+
+  return { snakes: s, apples: a };
 };
 
 export default ({ snakes, apples, boardSize, id, webSocket }) => {
@@ -33,10 +38,7 @@ export default ({ snakes, apples, boardSize, id, webSocket }) => {
   });
 
   return (
-    <svg
-      className="board"
-      viewBox={`-1 -1 ${boardSize + 2} ${boardSize + 2}`}
-    >
+    <svg className="board" viewBox={`-1 -1 ${boardSize + 2} ${boardSize + 2}`}>
       <Background size={boardSize} />
       {a.map(({ x, y }) => (
         <Apple key={`ap_${x}_${y}`} {...{ x, y }} />
