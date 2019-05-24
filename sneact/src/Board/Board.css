@@ -1,3 +1,20 @@
 .board .seg-bg {
   fill: gainsboro;
 }
+
+.board .seg-apple {
+  fill: red;
+}
+
+.board .seg-snake {
+  fill: limegreen;
+}
+
+.board .seg-your-snake {
+  fill: mediumseagreen;
+}
+
+.board text {
+  text-anchor: middle;
+  font-size: 1px;
+}

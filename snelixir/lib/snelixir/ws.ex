@@ -64,9 +64,19 @@ defmodule Snelixir.Ws do
     {:ok, {:game, game}}
   end
 
-  def websocket_handle(inframe, state) do
-    Logger.warn "Unknown WS message #{inspect inframe} in state '#{inspect state}'"
+  def websocket_handle({:text, msg}, state) do
+    Logger.warn "Unknown WS message #{inspect msg} in state '#{inspect state}'"
     {:ok, state}
+  end
+
+  def websocket_handle(:ping, state) do
+    Logger.debug "Empty ping received"
+    {:reply, :pong, state}
+  end
+
+  def websocket_handle({:ping, msg}, state) do
+    Logger.debug "Ping with message '#{msg}'received"
+    {:reply, :pong, state}
   end
 
 
