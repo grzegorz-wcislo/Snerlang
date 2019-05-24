@@ -128,8 +128,8 @@ export default () => {
         const { count, fullCount } = state;
         return <Lobby {...{ count, fullCount }} />;
       case "GAME":
-        const { board, boardSize, webSocket } = state;
-        return <Board {...{ ...board, boardSize, webSocket }} />;
+        const { board, boardSize, id, webSocket } = state;
+        return <Board {...{ ...board, boardSize, id, webSocket }} />;
       case "NOTIFICATION":
         const { msg, header } = state;
         return <Notification {...{ msg, header }} />;

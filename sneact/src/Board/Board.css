@@ -1,11 +1,3 @@
 .board .seg-bg {
   fill: gainsboro;
 }
-
-.board .seg-snake {
-  fill: limegreen;
-}
-
-.board .seg-apple {
-  fill: red;
-}

@@ -36,7 +36,7 @@ const handleMessage = (webSocket, { data }, dispatchState) => {
       break;
     case "victory":
     case "defeat":
-    dispatchState({ type: "NOTIFY", header: msg.header, msg: msg.msg });
+      dispatchState({ type: "NOTIFY", header: msg.header, msg: msg.msg });
       break;
     default:
       console.warn("Unknown message", data);

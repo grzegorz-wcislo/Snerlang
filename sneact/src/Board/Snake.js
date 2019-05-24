@@ -1,16 +1,11 @@
 import React from "react";
 import Segment from "./Segment";
 
-export default ({ name, tail }) => {
+export default ({ name, tail, color }) => {
   return (
     <>
       {tail.map(({ x, y }) => (
-        <Segment
-          key={`tl_${x}_${y}`}
-          className="snake"
-          color="limegreen"
-          {...{ x, y }}
-        />
+        <Segment key={`tl_${x}_${y}`} className="snake" {...{ x, y, color }} />
       ))}
       <text
         y={tail[0].y - 0.1}

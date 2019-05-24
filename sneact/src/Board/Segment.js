@@ -1,6 +1,6 @@
 import React from "react";
 
-export default ({ className, x, y }) => {
+export default ({ className, x, y, color }) => {
   return (
     <rect
       {...{ x, y }}
@@ -9,6 +9,7 @@ export default ({ className, x, y }) => {
       ry="0.3"
       width="0.95"
       height="0.95"
+      fill={color}
     />
   );
 };
