@@ -1,4 +1,9 @@
 defmodule Snelixir.GameLogic do
+  @length 23
+  @max_snake_count 2
+
+  def length, do: @length
+  def max_snake_count, do: @max_snake_count
 
   def init_board(snakes) do
     # snakes - list of pids
@@ -22,7 +27,7 @@ defmodule Snelixir.GameLogic do
   end
 
   def move_snakes(board) do
-    length = 23
+    length = length()
     {snakes_positions, snakes_directions, apples} = board
     # move snakes
     updated_snakes_positions = for snek <- snakes_positions, into: %{} do

@@ -4,7 +4,7 @@ import Background from "./Background";
 import Apple from "./Apple";
 import Snake from "./Snake";
 
-export default ({ snakes, apples, webSocket }) => {
+export default ({ snakes, apples, boardSize, webSocket }) => {
   useEffect(() => {
     const svg = document.getElementsByTagName("svg")[0];
 
@@ -67,8 +67,8 @@ export default ({ snakes, apples, webSocket }) => {
   });
 
   return (
-    <svg className="board" viewBox="-1 -1 25 25">
-      <Background size={23} />
+    <svg className="board" viewBox={`-1 -1 ${boardSize + 2} ${boardSize + 2}`}>
+      <Background size={boardSize} />
       {apples.map(({ x, y }) => (
         <Apple key={`ap_${x}_${y}`} {...{ x, y }} />
       ))}

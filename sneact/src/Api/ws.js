@@ -15,21 +15,28 @@ const handleMessage = (webSocket, { data }, dispatchState) => {
   console.log(msg);
   switch (msg.type) {
     case "lobby":
-      dispatchState({ type: "LOBBY", count: msg.count });
+      dispatchState({
+        type: "LOBBY",
+        id: msg.id,
+        count: msg.count,
+        fullCount: msg.fullCount,
+      });
       break;
     case "init_game":
       parseBoard = parseBoardCreate(msg);
-      dispatchState({ type: "GAME", webSocket });
+      dispatchState({
+        type: "GAME",
+        webSocket,
+        boardSize: msg.boardSize,
+      });
       break;
     case "board":
       const board = parseBoard(msg);
       dispatchState({ type: "BOARD", board });
       break;
     case "victory":
-      dispatchState({ type: "NOTIFY", header: "Victory Royale" });
-      break;
     case "defeat":
-      dispatchState({ type: "NOTIFY", header: "Defeat Rustique" });
+    dispatchState({ type: "NOTIFY", header: msg.header, msg: msg.msg });
       break;
     default:
       console.warn("Unknown message", data);

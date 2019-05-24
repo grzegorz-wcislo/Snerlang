@@ -9,7 +9,7 @@ defmodule Snelixir.Ws do
   end
 
   def lobby(snake, count) do
-    msg = Snelixir.WsPresenter.lobby_message(count)
+    msg = Snelixir.WsPresenter.lobby_message(snake, count)
     send(snake, {:send, msg})
   end
 

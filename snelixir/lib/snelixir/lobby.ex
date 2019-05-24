@@ -25,7 +25,7 @@ defmodule Snelixir.Lobby do
     Logger.info "Added #{inspect(snake)} to lobby"
     notify_snakes(Map.keys(snakes))
 
-    if map_size(snakes) == 2 do
+    if map_size(snakes) == Snelixir.GameLogic.max_snake_count do
       start_game(snakes)
       {:reply, :ok, %{}}
     else

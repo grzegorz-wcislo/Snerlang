@@ -53,11 +53,18 @@ const stateReducer = (state, action) => {
     case "LOGIN":
       return { ...state, name: action.name, state: "LOADING" };
     case "LOBBY":
-      return { ...state, count: action.count, state: "LOBBY" };
+      return {
+        ...state,
+        id: action.id,
+        count: action.count,
+        fullCount: action.fullCount,
+        state: "LOBBY",
+      };
     case "GAME":
       return {
         ...state,
         webSocket: action.webSocket,
+        boardSize: action.boardSize,
         board: emptyBoard,
         state: "GAME",
       };
@@ -118,12 +125,11 @@ export default () => {
       case "LOADING":
         return <Loading />;
       case "LOBBY":
-        const { count } = state;
-        const fullCount = 2;
+        const { count, fullCount } = state;
         return <Lobby {...{ count, fullCount }} />;
       case "GAME":
-        const { board, webSocket } = state;
-        return <Board {...{ ...board, webSocket }} />;
+        const { board, boardSize, webSocket } = state;
+        return <Board {...{ ...board, boardSize, webSocket }} />;
       case "NOTIFICATION":
         const { msg, header } = state;
         return <Notification {...{ msg, header }} />;
