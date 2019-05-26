@@ -27,23 +27,6 @@ defmodule Snelixir.GameLogic do
         {snake, :front}
       end
 
-    # return -> initial state
-    tab = [1, 2, 3]
-
-    List.last(tab)
-    |> IO.inspect(label: "last")
-
-    tab = List.delete(tab, List.last(tab))
-
-    tab
-    |> IO.inspect(label: "after delete")
-
-    tab = [0 | tab]
-
-    tab
-    |> IO.inspect(label: "after adding")
-
-    # snakes -> %{}
     {snakes_positions, snakes_directions, apples}
   end
 
@@ -102,8 +85,8 @@ defmodule Snelixir.GameLogic do
               case {dx, dy} do
                 {-1, 0} -> {x1, y1 + 1}
                 {1, 0} -> {x1, y1 - 1}
-                {0, -1} -> {x1 + 1, y1}
-                {0, 1} -> {x1 - 1, y1}
+                {0, -1} -> {x1 - 1, y1}
+                {0, 1} -> {x1 + 1, y1}
               end
           end
 
