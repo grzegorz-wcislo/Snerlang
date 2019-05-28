@@ -115,8 +115,9 @@ defmodule Snelixir.GameLogic do
 
     headList =
       for {id, body} <- updated_snakes_positions, into: [] do
-        {List.first(body)} #id,
+        List.first(body) #id,
       end
+
     updated_snakes_positions |> IO.inspect(label: "sneks")
     deadSnakes = Enum.filter(headList, fn el -> amount(el, updated_snakes_positions) end)
     apples |> IO.inspect(label: "apples")
@@ -131,7 +132,7 @@ defmodule Snelixir.GameLogic do
     {{updated_snakes_positions, updated_snakes_directions, updated_apples}, deadSnakes}
   end
 
-  defp amount({value}, updated_snakes_positions) do
+  defp amount(value, updated_snakes_positions) do
     acc = 0
     #updated_snakes_positions |> IO.inspect(label: "snakes")
     for {snakeId, segment} <- updated_snakes_positions do
