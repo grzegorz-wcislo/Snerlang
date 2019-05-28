@@ -123,6 +123,11 @@ defmodule Snelixir.GameLogic do
     apples |> IO.inspect(label: "apples")
     headList |> IO.inspect(label: "head list")
     updated_apples = Enum.filter(apples, fn apple -> not(apple in headList)  end) #!Enum.member?(headList, apple)
+    apples_to_add = apples -- updated_apples
+    new_apples = for apple <- apples_to_add, into: [] do
+      {Enum.random(1..23), Enum.random(1..23)}
+    end
+    updated_apples = updated_apples ++ new_apples
     #deadSnakes
     #|> IO.inspect(label: "dead Snakes")
     #updated_apples
