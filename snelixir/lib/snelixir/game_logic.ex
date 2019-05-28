@@ -7,7 +7,7 @@ defmodule Snelixir.GameLogic do
 
   def init_board(snakes) do
     # snakes - list of pids
-    apples = []
+    apples = [{5,5}, {7,8}]
 
     starting_positions = [
       [{3, 3}, {3, 2}, {3, 1}],
@@ -41,13 +41,13 @@ defmodule Snelixir.GameLogic do
         direction = Map.get(snakes_directions, id)
 
         id
-        |> IO.inspect(label: "id")
+        #|> IO.inspect(label: "id")
 
         head
-        |> IO.inspect(label: "head")
+        #|> IO.inspect(label: "head")
 
         neck
-        |> IO.inspect(label: "neck")
+        #|> IO.inspect(label: "neck")
 
         {x1, y1} = head
         {x2, y2} = neck
@@ -55,13 +55,13 @@ defmodule Snelixir.GameLogic do
         dy = delta(y1, y2, length)
 
         dx
-        |> IO.inspect(label: "dx")
+        #|> IO.inspect(label: "dx")
 
         dy
-        |> IO.inspect(label: "dy")
+        #|> IO.inspect(label: "dy")
 
         body
-        |> IO.inspect(label: "body before direction")
+        #|> IO.inspect(label: "body before direction")
 
         newHead =
           case direction do
@@ -90,8 +90,8 @@ defmodule Snelixir.GameLogic do
               end
           end
 
-        newHead
-        |> IO.inspect(label: "body after direction")
+        #newHead
+        #|> IO.inspect(label: "body after direction")
 
         {newx, newy} = newHead
         newHead = {rem(newx + length, length), rem(newy + length, length)}
@@ -115,24 +115,34 @@ defmodule Snelixir.GameLogic do
 
     headList =
       for {id, body} <- updated_snakes_positions, into: [] do
-        {id, List.first(body)}
+        {List.first(body)} #id,
       end
-
+    updated_snakes_positions |> IO.inspect(label: "sneks")
     deadSnakes = Enum.filter(headList, fn el -> amount(el, updated_snakes_positions) end)
-    updated_apples = Enum.filter(apples, fn apple -> !Enum.member?(headList, apple) end)
-
+    apples |> IO.inspect(label: "apples")
+    headList |> IO.inspect(label: "head list")
+    updated_apples = Enum.filter(apples, fn apple -> not(apple in headList)  end) #!Enum.member?(headList, apple)
+    #deadSnakes
+    #|> IO.inspect(label: "dead Snakes")
+    #updated_apples
+    #|> IO.inspect(label: "updated apples")
     # return -> {new state, list of pids of dead snakes}
     # {board, []}
     {{updated_snakes_positions, updated_snakes_directions, updated_apples}, deadSnakes}
   end
 
-  defp amount({id, value}, updated_snakes_positions) do
+  defp amount({value}, updated_snakes_positions) do
     acc = 0
-
+    #updated_snakes_positions |> IO.inspect(label: "snakes")
     for {snakeId, segment} <- updated_snakes_positions do
       for cube <- segment do
+        #IO.write("-------------")
+        #cube |> IO.inspect(label: "one cube")
+        #value |> IO.inspect(label: "value")
+        #IO.write("------------")
         if cube == value do
           acc = acc + 1
+          #acc |> IO.inspect(label: "appearance")
         end
       end
     end
