@@ -1,6 +1,6 @@
 defmodule Snelixir.GameLogic do
   @length 23
-  @max_snake_count 2
+  @max_snake_count 4
 
   def length, do: @length
   def max_snake_count, do: @max_snake_count
@@ -121,7 +121,7 @@ defmodule Snelixir.GameLogic do
       end
 
     updated_snakes_positions |> IO.inspect(label: "sneks")
-    deadSnakes = Enum.filter(headList, fn el -> amount(el, updated_snakes_positions) end)
+    deadSnakes = dead(updated_snakes_positions)
     apples |> IO.inspect(label: "apples")
     headList |> IO.inspect(label: "head list")
     updated_apples = Enum.filter(apples, fn apple -> not(apple in headList)  end) #!Enum.member?(headList, apple)
@@ -139,23 +139,24 @@ defmodule Snelixir.GameLogic do
     {{updated_snakes_positions, updated_snakes_directions, updated_apples}, deadSnakes}
   end
 
-  defp amount(value, updated_snakes_positions) do
-    acc = 0
-    #updated_snakes_positions |> IO.inspect(label: "snakes")
-    for {snakeId, segment} <- updated_snakes_positions do
-      for cube <- segment do
-        #IO.write("-------------")
-        #cube |> IO.inspect(label: "one cube")
-        #value |> IO.inspect(label: "value")
-        #IO.write("------------")
-        if cube == value do
-          acc = acc + 1
-          #acc |> IO.inspect(label: "appearance")
-        end
+  defp dead(snakes_positions) do
+    snakes_positions
+    |> Enum.filter(fn {snake_id, segments} ->
+      case segments do
+        [head | tail] ->
+          if Enum.member?(tail, head) do
+            true
+          else
+            snakes_positions
+            |> Map.delete(snake_id)
+            |> Map.values()
+            |> Enum.concat
+            |> Enum.member?(head)
+          end
+        _ -> false
       end
-    end
-
-    acc > 1
+    end)
+    |> Enum.map(fn s -> elem(s, 0) end)
   end
 
   defp delta(x1, x2, length) do
