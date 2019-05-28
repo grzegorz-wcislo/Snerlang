@@ -1,17 +1,19 @@
 defmodule Snelixir.GameLogic do
   @length 23
-  @max_snake_count 2
+  @max_snake_count 4
 
   def length, do: @length
   def max_snake_count, do: @max_snake_count
 
   def init_board(snakes) do
     # snakes - list of pids
-    apples = []
+    apples = [{5,5}, {7,8}, {12,11}, {6, 7}]
 
     starting_positions = [
       [{3, 3}, {3, 2}, {3, 1}],
-      [{3, 20}, {4, 20}, {5, 20}]
+      [{3, 20}, {4, 20}, {5, 20}],
+      [{20,20}, {20,19}, {20,18}],
+      [{20,3}, {21,3}, {22,3}]
     ]
 
     # ,[{20,20},{20,19}],[{20,3},{21,3}]]  #[head body body tail]
@@ -41,13 +43,13 @@ defmodule Snelixir.GameLogic do
         direction = Map.get(snakes_directions, id)
 
         id
-        |> IO.inspect(label: "id")
+        #|> IO.inspect(label: "id")
 
         head
-        |> IO.inspect(label: "head")
+        #|> IO.inspect(label: "head")
 
         neck
-        |> IO.inspect(label: "neck")
+        #|> IO.inspect(label: "neck")
 
         {x1, y1} = head
         {x2, y2} = neck
@@ -55,13 +57,13 @@ defmodule Snelixir.GameLogic do
         dy = delta(y1, y2, length)
 
         dx
-        |> IO.inspect(label: "dx")
+        #|> IO.inspect(label: "dx")
 
         dy
-        |> IO.inspect(label: "dy")
+        #|> IO.inspect(label: "dy")
 
         body
-        |> IO.inspect(label: "body before direction")
+        #|> IO.inspect(label: "body before direction")
 
         newHead =
           case direction do
@@ -90,8 +92,8 @@ defmodule Snelixir.GameLogic do
               end
           end
 
-        newHead
-        |> IO.inspect(label: "body after direction")
+        #newHead
+        #|> IO.inspect(label: "body after direction")
 
         {newx, newy} = newHead
         newHead = {rem(newx + length, length), rem(newy + length, length)}
@@ -115,29 +117,46 @@ defmodule Snelixir.GameLogic do
 
     headList =
       for {id, body} <- updated_snakes_positions, into: [] do
-        {id, List.first(body)}
+        List.first(body) #id,
       end
 
-    deadSnakes = Enum.filter(headList, fn el -> amount(el, updated_snakes_positions) end)
-    updated_apples = Enum.filter(apples, fn apple -> !Enum.member?(headList, apple) end)
-
+    updated_snakes_positions |> IO.inspect(label: "sneks")
+    deadSnakes = dead(updated_snakes_positions)
+    apples |> IO.inspect(label: "apples")
+    headList |> IO.inspect(label: "head list")
+    updated_apples = Enum.filter(apples, fn apple -> not(apple in headList)  end) #!Enum.member?(headList, apple)
+    apples_to_add = apples -- updated_apples
+    new_apples = for apple <- apples_to_add, into: [] do
+      {Enum.random(1..23), Enum.random(1..23)}
+    end
+    updated_apples = updated_apples ++ new_apples
+    #deadSnakes
+    #|> IO.inspect(label: "dead Snakes")
+    #updated_apples
+    #|> IO.inspect(label: "updated apples")
     # return -> {new state, list of pids of dead snakes}
     # {board, []}
     {{updated_snakes_positions, updated_snakes_directions, updated_apples}, deadSnakes}
   end
 
-  defp amount({id, value}, updated_snakes_positions) do
-    acc = 0
-
-    for {snakeId, segment} <- updated_snakes_positions do
-      for cube <- segment do
-        if cube == value do
-          acc = acc + 1
-        end
+  defp dead(snakes_positions) do
+    snakes_positions
+    |> Enum.filter(fn {snake_id, segments} ->
+      case segments do
+        [head | tail] ->
+          if Enum.member?(tail, head) do
+            true
+          else
+            snakes_positions
+            |> Map.delete(snake_id)
+            |> Map.values()
+            |> Enum.concat
+            |> Enum.member?(head)
+          end
+        _ -> false
       end
-    end
-
-    acc > 1
+    end)
+    |> Enum.map(fn s -> elem(s, 0) end)
   end
 
   defp delta(x1, x2, length) do
