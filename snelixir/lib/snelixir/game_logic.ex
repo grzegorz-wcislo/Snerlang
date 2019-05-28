@@ -7,11 +7,13 @@ defmodule Snelixir.GameLogic do
 
   def init_board(snakes) do
     # snakes - list of pids
-    apples = [{5,5}, {7,8}]
+    apples = [{5,5}, {7,8}, {12,11}, {6, 7}]
 
     starting_positions = [
       [{3, 3}, {3, 2}, {3, 1}],
-      [{3, 20}, {4, 20}, {5, 20}]
+      [{3, 20}, {4, 20}, {5, 20}],
+      [{20,20}, {20,19}, {20,18}],
+      [{20,3}, {21,3}, {22,3}]
     ]
 
     # ,[{20,20},{20,19}],[{20,3},{21,3}]]  #[head body body tail]
