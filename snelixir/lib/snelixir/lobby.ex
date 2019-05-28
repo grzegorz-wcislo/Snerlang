@@ -35,8 +35,9 @@ defmodule Snelixir.Lobby do
 
   def handle_info({:EXIT, snake, _reason}, snakes) do
     Logger.info("Removed #{inspect(snake)} from lobby")
-    notify_snakes(Map.keys(snakes))
-    {:noreply, Map.delete(snakes, snake)}
+    new_snakes = Map.delete(snakes, snake)
+    notify_snakes(Map.keys(new_snakes))
+    {:noreply, new_snakes}
   end
 
   ## Helper Functions

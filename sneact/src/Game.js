@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, createContext } from "react";
+import React, { useReducer, createContext } from "react";
 import Login from "./Login";
 import Loading from "./Loading";
 import Lobby from "./Lobby";
@@ -46,7 +46,6 @@ import { openConnection } from "./Api/ws.js";
 const emptyBoard = { snakes: [], apples: [] };
 
 const stateReducer = (state, action) => {
-  console.log(action);
   switch (action.type) {
     case "RESET":
       return { ...state, state: "LOGIN" };
@@ -112,10 +111,6 @@ export default () => {
   const registerError = msg => {
     dispatchState({ type: "NOTIFY", msg, header: "Error" });
   };
-
-  useEffect(() => {
-    console.log(state);
-  });
 
   const component = s => {
     switch (s) {

@@ -12,7 +12,6 @@ let parseBoard = () => ({ snakes: [], apples: [] });
 
 const handleMessage = (webSocket, { data }, dispatchState) => {
   const msg = JSON.parse(data);
-  console.log(msg);
   switch (msg.type) {
     case "lobby":
       dispatchState({
@@ -44,8 +43,6 @@ const handleMessage = (webSocket, { data }, dispatchState) => {
 };
 
 const parseBoardCreate = ({ snakes: snakeNames }) => {
-  console.log(snakeNames);
-
   return msg => {
     const { snakes, apples } = msg;
     const s = Object.keys(snakes).map(snake => {
