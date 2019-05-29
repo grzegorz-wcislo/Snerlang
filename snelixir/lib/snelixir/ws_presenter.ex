@@ -25,11 +25,25 @@ defmodule Snelixir.WsPresenter do
   end
 
   def win_msg do
-    JSON.encode!(%{type: :victory, header: "Victory Royale", msg: nil})
+    msg = Enum.random([
+      "Ez pz lemon squeazy",
+      "Winning isn’t everything, it’s the only thing",
+      "Losing feels worse than winning feels good",
+      nil
+    ])
+    JSON.encode!(%{type: :victory, header: "Victory Royale", msg: msg})
   end
 
   def lose_msg do
-    JSON.encode!(%{type: :defeat, header: "Defeat Rustique", msg: nil})
+    msg = Enum.random([
+      "Choose something else to play",
+      "You have been pwned",
+      "Difficult difficult lemon difficult",
+      "Have you tried lowering the difficulty?",
+      "To continue playing insert a coin",
+      nil
+    ])
+    JSON.encode!(%{type: :defeat, header: "Defeat Rustique", msg: msg})
   end
 
   defp snake_map_view(snakes) do
